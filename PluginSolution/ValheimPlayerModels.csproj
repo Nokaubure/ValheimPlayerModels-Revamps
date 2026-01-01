@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <Configurations>Debug;Release;SDK</Configurations>
     <PackageProjectUrl>https://github.com/Burrely/ValheimPlayerModels-Revamps</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Burrely/ValheimPlayerModels-Revamps</RepositoryUrl>
+    <RepositoryUrl></RepositoryUrl>
     <Product>Valheim Player Models</Product>
   </PropertyGroup>
 
@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <Target Name="PropertyValidation" AfterTargets="BeforeBuild">
-    <Error Text="GameDir property must be provided when PublicizeLocally is 'true'." Condition="'$(GameDir)' == '' and '$(PublicizeLocally)' == 'true'"/>
+    <Error Text="GameDir property must be provided when PublicizeLocally is 'true'." Condition="'$(GameDir)' == '' and '$(PublicizeLocally)' == 'true'" />
   </Target>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -33,6 +33,7 @@
   <ItemGroup>
     <!-- Used by both SDK and Plugin -->
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.50" IncludeAssets="compile" />
+    <PackageReference Include="ValheimGameLibs" Version="0.221.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'!='SDK'">
@@ -44,24 +45,55 @@
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'!='SDK' and ('$(GameDir)' == '' or '$(PublicizeLocally)' == 'false')">
-    <!-- Plugin Only, PublicizeLocally=False, use gamelibs from nuget -->
-    <PackageReference Include="Valheim.GameLibs" Version="*-*" IncludeAssets="compile" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(Configuration)'!='SDK' and '$(GameDir)' != '' and '$(PublicizeLocally)' == 'true'">
     <!-- Plugin Only, PublicizeLocally=True, use gamelibs from game directory -->
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
-    <Reference Include="$(GameDir)\valheim_Data\Managed\assembly_*.dll" IncludeAssets="compile" Publicize="true"/>
-    <Reference Include="$(GameDir)\valheim_Data\Managed\Splatform.dll" IncludeAssets="compile" Publicize="true"/>
-    <Reference Include="$(GameDir)\valheim_Data\Managed\SoftReferenceableAssets.dll" IncludeAssets="compile" Publicize="true"/>
+    <Reference Include="$(GameDir)\valheim_Data\Managed\assembly_*.dll" IncludeAssets="compile" Publicize="true" />
+    <Reference Include="$(GameDir)\valheim_Data\Managed\Splatform.dll" IncludeAssets="compile" Publicize="true" />
+    <Reference Include="$(GameDir)\valheim_Data\Managed\SoftReferenceableAssets.dll" IncludeAssets="compile" Publicize="true" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SoftReferenceableAssets">
+      <HintPath>Z:\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\SoftReferenceableAssets.dll</HintPath>
+    </Reference>
+    <Reference Include="Splatform">
+      <HintPath>Z:\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\Splatform.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == SDK (&#xD;&#xA; copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)..\UnitySDK\ValheimPlayerModelsSDK\&quot; /y&#xD;&#xA;) ELSE (&#xD;&#xA; echo Edit the Post-build event to export the plugin in your game folder&#xD;&#xA; copy &quot;$(TargetPath)&quot; &quot;$(TargetInstallDir)\BepInEx\plugins\$(TargetFileName)&quot; /y&#xD;&#xA; if $(ConfigurationName) == Debug (&#xD;&#xA;  copy &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(TargetInstallDir)\BepInEx\plugins\$(TargetName).pdb&quot; /y&#xD;&#xA; )&#xD;&#xA;)" />
+    <Exec Command="if $(ConfigurationName) == SDK (&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;Z:\vindiunity\Assets\Scripts\ValheimPlayerModelsSDK\ValheimPlayerModels.dll&quot;&#xD;&#xA;)&#xD;&#xA;ELSE&#xD;&#xA;(&#xD;&#xA;copy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;C:\Users\Noka\AppData\Roaming\Thunderstore Mod Manager\DataFolder\Valheim\profiles\Default\BepInEx\plugins\ValheimPlayerModels.dll&quot;&#xD;&#xA;)" />
   </Target>
 </Project>

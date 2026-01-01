@@ -64,19 +64,19 @@ namespace ValheimPlayerModels
         public List<float> animatorParameterDefaultValues;
         
         // legacy parameter lists
-        public List<string> boolParameters;
-        public List<bool> boolParametersDefault;
-        public List<string> intParameters;
-        public List<int> intParametersDefault;
-        public List<string> floatParameters;
-        public List<float> floatParametersDefault;
+        public List<string> boolParameters = new List<string>();
+        public List<bool> boolParametersDefault = new List<bool>();
+        public List<string> intParameters = new List<string>();
+        public List<int> intParametersDefault = new List<int>();
+        public List<string> floatParameters = new List<string>();
+        public List<float> floatParametersDefault = new List<float>();
 
         public List<ValheimAvatarActionMenuItem> actionMenuItems = [];
         
-        public string[] controlName;
-        public ControlType[] controlTypes;
-        public string[] controlParameterNames;
-        public float[] controlValues;
+        public string[] controlName = new string[0];
+        public ControlType[] controlTypes = new ControlType[0];
+        public string[] controlParameterNames = new string[0];
+        public float[] controlValues = new float[0];
 
         private void Awake()
         {

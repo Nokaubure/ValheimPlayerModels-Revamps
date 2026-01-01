@@ -58,7 +58,7 @@ namespace ValheimPlayerModels
             ogVisual = player.m_animator.gameObject;
 
             ogAnimator = player.m_animator;
-            ogAnimator.keepAnimatorControllerStateOnDisable = true;
+            ogAnimator.keepAnimatorStateOnDisable = true;
             ogAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
             StartCoroutine(LoadAvatar());
