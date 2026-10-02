@@ -33,6 +33,7 @@ namespace ValheimPlayerModels.Loaders
             public ControlType type;
             public string parameter;
             public float value;
+            public float maxvalue;
         }
 
         private PlayerModel Owner;
@@ -98,6 +99,7 @@ namespace ValheimPlayerModels.Loaders
                     throw new ArgumentOutOfRangeException();
             }
         }
+
 
         public bool SetBool(string name, bool value)
         {

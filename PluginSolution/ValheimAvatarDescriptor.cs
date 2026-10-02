@@ -54,29 +54,26 @@ namespace ValheimPlayerModels
         public bool showHelmet;
         public bool showCape;
         
-        public List<ValheimAvatarParameter> animatorParameters = [];
+        public List<ValheimAvatarParameter> animatorParameters = new List<ValheimAvatarParameter>();
 
         // unfortunately, BepInEx plugin structs & classes do not work properly with Unity's serialization system
         // we could use https://github.com/xiaoxiao921/FixPluginTypesSerialization to fix this, or maybe JsonUtility
         // but this is a simple workaround that works fine, so we'll use it for now
-        public List<string> animatorParameterNames;
-        public List<ValheimAvatarParameterType> animatorParameterTypes;
-        public List<float> animatorParameterDefaultValues;
+        public List<string> animatorParameterNames = new List<string>();
+        public List<ValheimAvatarParameterType> animatorParameterTypes = new List<ValheimAvatarParameterType>();
+        public List<float> animatorParameterDefaultValues = new List<float>();
         
-        // legacy parameter lists
-        public List<string> boolParameters = new List<string>();
-        public List<bool> boolParametersDefault = new List<bool>();
-        public List<string> intParameters = new List<string>();
-        public List<int> intParametersDefault = new List<int>();
-        public List<string> floatParameters = new List<string>();
-        public List<float> floatParametersDefault = new List<float>();
-
-        public List<ValheimAvatarActionMenuItem> actionMenuItems = [];
+        public List<ValheimAvatarActionMenuItem> actionMenuItems = new List<ValheimAvatarActionMenuItem>();
         
-        public string[] controlName = new string[0];
-        public ControlType[] controlTypes = new ControlType[0];
-        public string[] controlParameterNames = new string[0];
-        public float[] controlValues = new float[0];
+        // parallel lists to serialize actionMenuItems reliably
+        [HideInInspector]
+        public List<string> actionMenuItemNames = new List<string>();
+        [HideInInspector]
+        public List<ControlType> actionMenuItemTypes = new List<ControlType>();
+        [HideInInspector]
+        public List<string> actionMenuItemParameterNames = new List<string>();
+        [HideInInspector]
+        public List<float> actionMenuItemValues = new List<float>();
 
         private void Awake()
         {
@@ -85,49 +82,42 @@ namespace ValheimPlayerModels
 
         public void Validate()
         {
-            
-            // if (boolParametersDefault.Count != boolParameters.Count)
-            //     boolParametersDefault.Resize(boolParameters.Count);
-            //
-            // if (intParametersDefault.Count != intParameters.Count)
-            //     intParametersDefault.Resize(intParameters.Count);
-            //
-            // if (floatParametersDefault.Count != floatParameters.Count)
-            //     floatParametersDefault.Resize(floatParameters.Count);
-
-            if (controlTypes.Length != controlName.Length)
-                Array.Resize(ref controlTypes, controlName.Length);
-
-            if (controlParameterNames.Length != controlName.Length)
-                Array.Resize(ref controlParameterNames, controlName.Length);
-
-            if (controlValues.Length != controlName.Length)
-                Array.Resize(ref controlValues, controlName.Length);
+           
         }
 
         public void OnBeforeSerialize() {
-            // null out the legacy parameter lists
-            boolParameters = null;
-            boolParametersDefault = null;
-            intParameters = null;
-            intParametersDefault = null;
-            floatParameters = null;
-            floatParametersDefault = null;
-            
-            animatorParameterNames = [];
-            animatorParameterTypes = [];
-            animatorParameterDefaultValues = [];
+            // clear legacy lists by ensuring they are not used anymore
+
+            animatorParameterNames.Clear();
+            animatorParameterTypes.Clear();
+            animatorParameterDefaultValues.Clear();
+
             foreach (var parameter in animatorParameters)
             {
                 animatorParameterNames.Add(parameter.name);
                 animatorParameterTypes.Add(parameter.type);
                 animatorParameterDefaultValues.Add(parameter.defaultValue);
             }
+
+            // prepare action menu parallel lists for serialization
+            actionMenuItemNames.Clear();
+            actionMenuItemTypes.Clear();
+            actionMenuItemParameterNames.Clear();
+            actionMenuItemValues.Clear();
+
+            foreach (var item in actionMenuItems)
+            {
+                actionMenuItemNames.Add(item.name);
+                actionMenuItemTypes.Add(item.type);
+                actionMenuItemParameterNames.Add(item.parameterName);
+                actionMenuItemValues.Add(item.value);
+            }
         }
         public void OnAfterDeserialize() {
+            //Plugin.Log.LogInfo("actionMenuItems " + actionMenuItems.Count);
             #if PLUGIN
             // only fill in the true parameter list from the individual lists in the plugin
-            animatorParameters = [];
+            animatorParameters.Clear();
             for (var i = 0; i < animatorParameterNames.Count; i++)
             {
                 animatorParameters.Add(new ValheimAvatarParameter
@@ -137,34 +127,18 @@ namespace ValheimPlayerModels
                     defaultValue = animatorParameterDefaultValues[i]
                 });
             }
-            // also fill in from the legacy parameter lists
-            if (boolParameters == null) return;
-            Plugin.Log.LogInfo($"Avatar {name} has legacy parameters, transferring to new system");
-            for (var i = 0; i < boolParameters.Count; i++)
+
+            // reconstruct actionMenuItems from parallel lists
+            actionMenuItems.Clear();
+            var count = Math.Min(Math.Min(actionMenuItemNames.Count, actionMenuItemTypes.Count), Math.Min(actionMenuItemParameterNames.Count, actionMenuItemValues.Count));
+            for (var i = 0; i < count; i++)
             {
-                animatorParameters.Add(new ValheimAvatarParameter
+                actionMenuItems.Add(new ValheimAvatarActionMenuItem
                 {
-                    name = boolParameters[i],
-                    type = ValheimAvatarParameterType.Bool,
-                    defaultValue = boolParametersDefault[i] ? 1 : 0
-                });
-            }
-            for (var i = 0; i < intParameters.Count; i++)
-            {
-                animatorParameters.Add(new ValheimAvatarParameter
-                {
-                    name = intParameters[i],
-                    type = ValheimAvatarParameterType.Int,
-                    defaultValue = intParametersDefault[i]
-                });
-            }
-            for (var i = 0; i < floatParameters.Count; i++)
-            {
-                animatorParameters.Add(new ValheimAvatarParameter
-                {
-                    name = floatParameters[i],
-                    type = ValheimAvatarParameterType.Float,
-                    defaultValue = floatParametersDefault[i]
+                    name = actionMenuItemNames[i],
+                    type = actionMenuItemTypes[i],
+                    parameterName = actionMenuItemParameterNames[i],
+                    value = actionMenuItemValues[i]
                 });
             }
             #endif

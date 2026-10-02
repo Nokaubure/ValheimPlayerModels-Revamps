@@ -318,7 +318,7 @@ namespace ValheimPlayerModels
                             GUILayout.FlexibleSpace();
                             // this is still not centered! the bar is 1 pixel too high and is an odd height so is impossible to center
                             // since the slider dot / point is an even height...
-                            var sliderValue = GUILayout.HorizontalSlider(parameterValue, 0.0f, 1.0f, GUILayout.ExpandHeight(false));
+                            var sliderValue = GUILayout.HorizontalSlider(parameterValue, 0.0f, avatar.MenuControls[i].maxvalue, GUILayout.ExpandHeight(false));
                             GUILayout.FlexibleSpace();
                             GUILayout.EndVertical();
                             if (Mathf.Abs(sliderValue - parameterValue) > 0.01f) {

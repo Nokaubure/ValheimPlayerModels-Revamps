@@ -390,7 +390,7 @@ namespace ValheimPlayerModels
         private void ApplyAvatar()
         {
             avatar.Animator.applyRootMotion = true;
-            avatar.Animator.updateMode = ogAnimator.updateMode;
+           // avatar.Animator.updateMode = ogAnimator.updateMode;
             avatar.Animator.feetPivotActive = ogAnimator.feetPivotActive;
             avatar.Animator.layersAffectMassCenter = ogAnimator.layersAffectMassCenter;
             avatar.Animator.stabilizeFeet = ogAnimator.stabilizeFeet;

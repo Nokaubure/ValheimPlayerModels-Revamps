@@ -135,9 +135,10 @@ namespace ValheimPlayerModels.Loaders
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
+                    Plugin.Log.LogInfo("Added new parameter " + name);
                 }
             }
-
+            Plugin.Log.LogInfo("Parameter count " + avatarInstance.Parameters.Count);
             // if (avatarInstance.AvatarDescriptor.boolParameters != null)
             // {
             //     for (int i = 0; i < avatarInstance.AvatarDescriptor.boolParameters.Count; i++)
@@ -186,20 +187,23 @@ namespace ValheimPlayerModels.Loaders
 
             avatarInstance.MenuControls = new List<AvatarInstance.MenuControl>();
 
-            if (avatarInstance.AvatarDescriptor.controlName != null)
+            if (avatarInstance.AvatarDescriptor.actionMenuItems != null)
             {
-                for (int i = 0; i < avatarInstance.AvatarDescriptor.controlName.Length; i++)
+                for (int i = 0; i < avatarInstance.AvatarDescriptor.actionMenuItems.Count; i++)
                 {
                     avatarInstance.MenuControls.Add(new AvatarInstance.MenuControl
                     {
-                        name = avatarInstance.AvatarDescriptor.controlName[i],
-                        type = avatarInstance.AvatarDescriptor.controlTypes[i],
-                        parameter = avatarInstance.AvatarDescriptor.controlParameterNames[i],
-                        value = avatarInstance.AvatarDescriptor.controlValues[i]
+                        name = avatarInstance.AvatarDescriptor.actionMenuItems[i].name,
+                        type = avatarInstance.AvatarDescriptor.actionMenuItems[i].type,
+                        parameter = avatarInstance.AvatarDescriptor.actionMenuItems[i].parameterName,
+                        value = avatarInstance.AvatarDescriptor.actionMenuItems[i].type == ControlType.Slider ? 0f : avatarInstance.AvatarDescriptor.actionMenuItems[i].value,
+                        maxvalue = avatarInstance.AvatarDescriptor.actionMenuItems[i].type == ControlType.Slider ? avatarInstance.AvatarDescriptor.actionMenuItems[i].value : 1f
                     });
+                    Plugin.Log.LogInfo("Added new menu control " + avatarInstance.AvatarDescriptor.actionMenuItems[i].name);
                 }
+                
             }
-
+            Plugin.Log.LogInfo("Menu control count " + avatarInstance.MenuControls.Count);
             #endregion
 
             LoadedAvatarInstance = avatarInstance;
