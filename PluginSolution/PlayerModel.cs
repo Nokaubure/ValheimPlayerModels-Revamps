@@ -454,19 +454,23 @@ namespace ValheimPlayerModels
                 visEquipment.m_hairItemInstance?.SetActive(visible);
                 visEquipment.m_helmetItemInstance?.SetActive(visible || avatar.AvatarDescriptor.showHelmet);
 
-                if(visEquipment.m_shoulderItemInstances != null)
+                if (visEquipment.m_shoulderItemInstances != null)
                     foreach (GameObject itemInstance in visEquipment.m_shoulderItemInstances)
                     {
-                        if (visEquipment.m_shoulderItem.ToLower().Contains("cape"))
+                        foreach (Transform childTransform in itemInstance.transform)
                         {
-                            itemInstance?.SetActive(visible || avatar.AvatarDescriptor.showCape);
-                            foreach (SkinnedMeshRenderer skinnedMeshRenderer in itemInstance.GetComponentsInChildren<SkinnedMeshRenderer>())
+                            var child = childTransform.gameObject;
+                            if (child.name.ToLower().Contains("cape"))
                             {
-                                skinnedMeshRenderer.forceRenderingOff = false;
-                                skinnedMeshRenderer.updateWhenOffscreen = true;
+                                child?.SetActive(visible || avatar.AvatarDescriptor.showCape);
+                                foreach (SkinnedMeshRenderer skinnedMeshRenderer in child.GetComponentsInChildren<SkinnedMeshRenderer>())
+                                {
+                                    skinnedMeshRenderer.forceRenderingOff = false;
+                                    skinnedMeshRenderer.updateWhenOffscreen = true;
+                                }
                             }
+                            else child?.SetActive(visible);
                         }
-                        else itemInstance?.SetActive(visible);
                     }
                 if (visEquipment.m_legItemInstances != null)
                     foreach (GameObject itemInstance in visEquipment.m_legItemInstances) { itemInstance?.SetActive(visible); }
