@@ -20,6 +20,16 @@ namespace ValheimPlayerModels
         Float
     }
 
+    public enum ValheimAvatarSoundType
+    {
+        Attack,
+        HeavyAttack,
+        Jump,
+        Hurt,
+        Dead,
+        Skill
+    }
+
     [Serializable]
     public struct ValheimAvatarParameter
     {
@@ -53,6 +63,14 @@ namespace ValheimPlayerModels
 
         public bool showHelmet;
         public bool showCape;
+
+        [Header("Action Sounds")]
+        public AudioClip[] attackSounds = new AudioClip[0];
+        public AudioClip[] heavyAttackSounds = new AudioClip[0];
+        public AudioClip[] jumpSounds = new AudioClip[0];
+        public AudioClip[] hurtSounds = new AudioClip[0];
+        public AudioClip[] deadSounds = new AudioClip[0];
+        public AudioClip[] skillSounds = new AudioClip[0];
         
         public List<ValheimAvatarParameter> animatorParameters = new List<ValheimAvatarParameter>();
 

@@ -15,6 +15,12 @@ namespace ValheimPlayerModels
     [DefaultExecutionOrder(int.MaxValue-1)]
     public class PlayerModel : MonoBehaviour
     {
+        private struct PendingAvatarSound
+        {
+            public ValheimAvatarSoundType type;
+            public int index;
+        }
+
         public class AttachTransform
         {
             public Transform ogAttach;
@@ -45,6 +51,7 @@ namespace ValheimPlayerModels
         private float footOffset;
         private bool dead = false;
         private bool requestHide;
+        private readonly List<PendingAvatarSound> pendingAvatarSounds = new List<PendingAvatarSound>();
 
         public bool enableTracking = true;
 
@@ -55,6 +62,8 @@ namespace ValheimPlayerModels
             player = GetComponent<Player>();
             visEquipment = GetComponent<VisEquipment>();
             zNetView = GetComponent<ZNetView>();
+            if (zNetView != null && !GetComponent<PlayerModelSoundRpc>())
+                gameObject.AddComponent<PlayerModelSoundRpc>();
             ogVisual = player.m_animator.gameObject;
 
             ogAnimator = player.m_animator;
@@ -336,6 +345,51 @@ namespace ValheimPlayerModels
             
             ApplyAvatar();
             playerModelLoaded = true;
+            foreach (PendingAvatarSound pendingSound in pendingAvatarSounds)
+            {
+                if (pendingSound.index < 0)
+                    PlayAvatarSound(pendingSound.type);
+                else
+                    avatar.PlaySound(pendingSound.type, pendingSound.index);
+            }
+            pendingAvatarSounds.Clear();
+        }
+
+        public void PlayAvatarSound(ValheimAvatarSoundType soundType)
+        {
+            if (zNetView != null && zNetView.IsValid())
+            {
+                // The player who owns this network object sends the event once. Other peers
+                // play the sound when they receive the RPC, avoiding duplicate playback.
+                if (!zNetView.IsOwner()) return;
+            }
+
+            if (avatar == null || !playerModelLoaded)
+            {
+                pendingAvatarSounds.Add(new PendingAvatarSound { type = soundType, index = -1 });
+                return;
+            }
+
+            int soundCount = avatar.GetSoundCount(soundType);
+            if (soundCount == 0) return;
+
+            int soundIndex = UnityEngine.Random.Range(0, soundCount);
+            if (zNetView != null && zNetView.IsValid())
+                zNetView.InvokeRPC("RPC_VPM_PlayAvatarSound", (int)soundType, soundIndex);
+            avatar.PlaySound(soundType, soundIndex);
+        }
+
+        internal void ReceiveAvatarSound(int soundType, int soundIndex)
+        {
+            if (zNetView != null && zNetView.IsValid() && zNetView.IsOwner()) return;
+            if (!System.Enum.IsDefined(typeof(ValheimAvatarSoundType), soundType)) return;
+            if (soundIndex < 0) return;
+
+            ValheimAvatarSoundType actionSound = (ValheimAvatarSoundType)soundType;
+            if (avatar != null && playerModelLoaded)
+                avatar.PlaySound(actionSound, soundIndex);
+            else
+                pendingAvatarSounds.Add(new PendingAvatarSound { type = actionSound, index = soundIndex });
         }
 
         private void LoadParametersFromFile() {
@@ -539,6 +593,24 @@ namespace ValheimPlayerModels
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Keeps the sound RPC registered on the player object while PlayerModel is reloaded.
+    /// </summary>
+    internal class PlayerModelSoundRpc : MonoBehaviour
+    {
+        private void Awake()
+        {
+            ZNetView zNetView = GetComponent<ZNetView>();
+            if (zNetView != null)
+                zNetView.Register<int, int>("RPC_VPM_PlayAvatarSound", RPC_PlayAvatarSound);
+        }
+
+        private void RPC_PlayAvatarSound(long sender, int soundType, int soundIndex)
+        {
+            GetComponent<PlayerModel>()?.ReceiveAvatarSound(soundType, soundIndex);
+        }
     }
 }
 #endif

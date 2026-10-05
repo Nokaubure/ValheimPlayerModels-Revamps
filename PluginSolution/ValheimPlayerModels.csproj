@@ -29,6 +29,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE;PLUGIN</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ValheimAvatarDescriptorInspector.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <!-- Used by both SDK and Plugin -->

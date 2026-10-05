@@ -296,7 +296,13 @@ namespace ValheimPlayerModels
 
                             break;
                         case ControlType.Toggle:
-                            var wasActive = parameterValue == avatar.MenuControls[i].value;
+                            float toggleValue = avatar.MenuControls[i].value == 0
+                                ? 1
+                                : avatar.MenuControls[i].value;
+                            bool isBoolParameter = avatar.Parameters[paramId].type == AvatarInstance.ParameterType.Bool;
+                            var wasActive = isBoolParameter
+                                ? parameterValue != 0
+                                : parameterValue == toggleValue;
                             // sandwich between two flexible spaces to center it vertically
                             GUILayout.BeginVertical();
                             GUILayout.FlexibleSpace();
@@ -307,7 +313,7 @@ namespace ValheimPlayerModels
                             GUILayout.FlexibleSpace();
                             GUILayout.EndVertical();
                             if (isActive != wasActive) {
-                                avatar.SetParameterValue(paramId, isActive ? avatar.MenuControls[i].value : 0);
+                                avatar.SetParameterValue(paramId, isActive ? toggleValue : 0);
                                 setParams.Add(paramId);
                             }
 

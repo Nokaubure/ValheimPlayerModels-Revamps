@@ -43,12 +43,45 @@ namespace ValheimPlayerModels.Loaders
         public Transform RightFoot;
         public Transform Hips;
         public Animator Animator;
+        public AudioSource AudioSource;
         public LODGroup lodGroup;
         public ValheimAvatarDescriptor AvatarDescriptor;
         public Dictionary<int, AvatarParameter> Parameters;
         public List<MenuControl> MenuControls;
 
         public AvatarInstance(PlayerModel owner) => Owner = owner;
+
+        private AudioClip[] GetSounds(ValheimAvatarSoundType soundType)
+        {
+            if (AvatarDescriptor == null) return null;
+
+            switch (soundType)
+            {
+                case ValheimAvatarSoundType.Attack: return AvatarDescriptor.attackSounds;
+                case ValheimAvatarSoundType.HeavyAttack: return AvatarDescriptor.heavyAttackSounds;
+                case ValheimAvatarSoundType.Jump: return AvatarDescriptor.jumpSounds;
+                case ValheimAvatarSoundType.Hurt: return AvatarDescriptor.hurtSounds;
+                case ValheimAvatarSoundType.Dead: return AvatarDescriptor.deadSounds;
+                case ValheimAvatarSoundType.Skill: return AvatarDescriptor.skillSounds;
+                default: return null;
+            }
+        }
+
+        public int GetSoundCount(ValheimAvatarSoundType soundType)
+        {
+            AudioClip[] sounds = GetSounds(soundType);
+            return sounds == null ? 0 : sounds.Length;
+        }
+
+        public void PlaySound(ValheimAvatarSoundType soundType, int soundIndex)
+        {
+            if (!AudioSource || !AudioSource.isActiveAndEnabled) return;
+
+            AudioClip[] sounds = GetSounds(soundType);
+            if (sounds == null || soundIndex < 0 || soundIndex >= sounds.Length) return;
+            AudioClip sound = sounds[soundIndex];
+            if (sound) AudioSource.PlayOneShot(sound);
+        }
 
         #region Animator Params Methods
 

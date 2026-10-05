@@ -10,6 +10,60 @@ using Object = UnityEngine.Object;
 
 namespace ValheimPlayerModels
 {
+	[HarmonyPatch(typeof(Humanoid), nameof(Humanoid.StartAttack))]
+	static class Patch_Humanoid_StartAttack_Sounds
+	{
+		[HarmonyPostfix]
+		static void Postfix(Humanoid __instance, bool __result, bool secondaryAttack)
+		{
+			if (__result && __instance is Player player)
+				player.GetComponent<PlayerModel>()?.PlayAvatarSound(secondaryAttack
+					? ValheimAvatarSoundType.HeavyAttack
+					: ValheimAvatarSoundType.Attack);
+		}
+	}
+
+	[HarmonyPatch(typeof(Player), nameof(Player.StartGuardianPower))]
+	static class Patch_Player_StartGuardianPower_Sounds
+	{
+		[HarmonyPostfix]
+		static void Postfix(Player __instance, bool __result)
+		{
+			if (__result)
+				__instance.GetComponent<PlayerModel>()?.PlayAvatarSound(ValheimAvatarSoundType.Skill);
+		}
+	}
+
+	[HarmonyPatch(typeof(Player), nameof(Player.OnJump))]
+	static class Patch_Player_OnJump_Sounds
+	{
+		[HarmonyPostfix]
+		static void Postfix(Player __instance)
+		{
+			__instance.GetComponent<PlayerModel>()?.PlayAvatarSound(ValheimAvatarSoundType.Jump);
+		}
+	}
+
+	[HarmonyPatch(typeof(Player), nameof(Player.OnDamaged))]
+	static class Patch_Player_OnDamaged_Sounds
+	{
+		[HarmonyPostfix]
+		static void Postfix(Player __instance)
+		{
+			__instance.GetComponent<PlayerModel>()?.PlayAvatarSound(ValheimAvatarSoundType.Hurt);
+		}
+	}
+
+	[HarmonyPatch(typeof(Player), nameof(Player.OnDeath))]
+	static class Patch_Player_OnDeath_Sounds
+	{
+		[HarmonyPostfix]
+		static void Postfix(Player __instance)
+		{
+			__instance.GetComponent<PlayerModel>()?.PlayAvatarSound(ValheimAvatarSoundType.Dead);
+		}
+	}
+
 	[HarmonyPatch(typeof(Player), "Awake")]
 	static class Patch_Player_Awake
 	{

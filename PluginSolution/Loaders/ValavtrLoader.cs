@@ -57,6 +57,10 @@ namespace ValheimPlayerModels.Loaders
             avatarInstance.AvatarDescriptor = avatarInstance.AvatarObject.GetComponent<ValheimAvatarDescriptor>();
             avatarInstance.Animator = avatarInstance.AvatarObject.GetComponent<Animator>();
 
+            avatarInstance.AudioSource = avatarInstance.AvatarObject.AddComponent<AudioSource>();
+            avatarInstance.AudioSource.playOnAwake = false;
+            avatarInstance.AudioSource.spatialBlend = 1f;
+
             avatarInstance.Transform = avatarInstance.AvatarObject.transform;
             avatarInstance.Transform.SetParent(playerModel.transform, false);
 
