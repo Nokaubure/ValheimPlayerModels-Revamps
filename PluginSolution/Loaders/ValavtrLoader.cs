@@ -60,6 +60,12 @@ namespace ValheimPlayerModels.Loaders
             avatarInstance.AudioSource = avatarInstance.AvatarObject.AddComponent<AudioSource>();
             avatarInstance.AudioSource.playOnAwake = false;
             avatarInstance.AudioSource.spatialBlend = 1f;
+            avatarInstance.AudioSource.volume = avatarInstance.AvatarDescriptor
+                ? Mathf.Clamp01(avatarInstance.AvatarDescriptor.soundVolume)
+                : 1f;
+            avatarInstance.AudioSource.bypassEffects = true;
+            avatarInstance.AudioSource.bypassListenerEffects = true;
+            avatarInstance.AudioSource.bypassReverbZones = true;
 
             avatarInstance.Transform = avatarInstance.AvatarObject.transform;
             avatarInstance.Transform.SetParent(playerModel.transform, false);

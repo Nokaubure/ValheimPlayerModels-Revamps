@@ -55,6 +55,16 @@ namespace ValheimPlayerModels
 
         public bool enableTracking = true;
 
+        public string GetAvatarDisplayName()
+        {
+            if (avatar != null && avatar.AvatarDescriptor != null &&
+                !string.IsNullOrEmpty(avatar.AvatarDescriptor.avatarName) &&
+                !string.Equals(avatar.AvatarDescriptor.avatarName, "player", StringComparison.OrdinalIgnoreCase))
+                return avatar.AvatarDescriptor.avatarName;
+
+            return selectedAvatar;
+        }
+
         #region Unity Events
 
         private void Awake()
@@ -375,7 +385,7 @@ namespace ValheimPlayerModels
 
             int soundIndex = UnityEngine.Random.Range(0, soundCount);
             if (zNetView != null && zNetView.IsValid())
-                zNetView.InvokeRPC("RPC_VPM_PlayAvatarSound", (int)soundType, soundIndex);
+                zNetView.InvokeRPC(ZNetView.Everybody, "RPC_VPM_PlayAvatarSound", (int)soundType, soundIndex);
             avatar.PlaySound(soundType, soundIndex);
         }
 

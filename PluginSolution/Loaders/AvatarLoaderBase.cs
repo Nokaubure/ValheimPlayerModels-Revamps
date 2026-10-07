@@ -80,7 +80,11 @@ namespace ValheimPlayerModels.Loaders
             AudioClip[] sounds = GetSounds(soundType);
             if (sounds == null || soundIndex < 0 || soundIndex >= sounds.Length) return;
             AudioClip sound = sounds[soundIndex];
-            if (sound) AudioSource.PlayOneShot(sound);
+            if (!sound) return;
+
+            AudioSource.Stop();
+            AudioSource.clip = sound;
+            AudioSource.Play();
         }
 
         #region Animator Params Methods

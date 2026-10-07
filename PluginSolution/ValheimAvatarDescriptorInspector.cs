@@ -31,6 +31,7 @@ public class ValheimAvatarDescriptorInspector : Editor
     private SerializedProperty showHelmet;
     private SerializedProperty showCape;
 
+    private SerializedProperty soundVolume;
     private SerializedProperty attackSounds;
     private SerializedProperty heavyAttackSounds;
     private SerializedProperty jumpSounds;
@@ -76,6 +77,7 @@ public class ValheimAvatarDescriptorInspector : Editor
         showHelmet = serializedObject.FindProperty("showHelmet");
         showCape = serializedObject.FindProperty("showCape");
 
+        soundVolume = serializedObject.FindProperty("soundVolume");
         attackSounds = serializedObject.FindProperty("attackSounds");
         heavyAttackSounds = serializedObject.FindProperty("heavyAttackSounds");
         jumpSounds = serializedObject.FindProperty("jumpSounds");
@@ -212,6 +214,7 @@ public class ValheimAvatarDescriptorInspector : Editor
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Action Sounds", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(soundVolume, new GUIContent("Sound Volume"));
         EditorGUILayout.PropertyField(attackSounds, new GUIContent("Attack Sounds"), true);
         EditorGUILayout.PropertyField(heavyAttackSounds, new GUIContent("Heavy Attack Sounds"), true);
         EditorGUILayout.PropertyField(jumpSounds, new GUIContent("Jump Sounds"), true);

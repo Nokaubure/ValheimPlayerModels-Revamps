@@ -2,14 +2,110 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
+using Splatform;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace ValheimPlayerModels
 {
+	[HarmonyPatch(typeof(Player), nameof(Player.GetPlayerName))]
+	static class Patch_Player_GetPlayerName_AvatarName
+	{
+		[HarmonyPostfix]
+		static void Postfix(Player __instance, ref string __result)
+		{
+			PlayerModel playerModel = __instance.GetComponent<PlayerModel>();
+			string avatarName = playerModel ? playerModel.GetAvatarDisplayName() : null;
+			if (!string.IsNullOrEmpty(avatarName))
+				__result = avatarName;
+		}
+	}
+
+	[HarmonyPatch(typeof(Player), nameof(Player.GetHoverName))]
+	static class Patch_Player_GetHoverName_AvatarName
+	{
+		[HarmonyPostfix]
+		static void Postfix(Player __instance, ref string __result)
+		{
+			PlayerModel playerModel = __instance.GetComponent<PlayerModel>();
+			string avatarName = playerModel ? playerModel.GetAvatarDisplayName() : null;
+			if (!string.IsNullOrEmpty(avatarName))
+				__result = avatarName;
+		}
+	}
+
+	[HarmonyPatch(typeof(ZNet), nameof(ZNet.TryGetPlayerByPlatformUserID))]
+	static class Patch_ZNet_TryGetPlayerByPlatformUserID_AvatarName
+	{
+		[HarmonyPostfix]
+		static void Postfix(ref ZNet.PlayerInfo __1, bool __result)
+		{
+			if (!__result) return;
+			long characterUserID = __1.m_characterID.UserID;
+
+			PlayerModel playerModel = Object.FindObjectsOfType<PlayerModel>().FirstOrDefault(model =>
+				model && model.player &&
+				model.player.GetZDOID().UserID == characterUserID);
+			if (!playerModel) return;
+
+			string avatarName = playerModel.GetAvatarDisplayName();
+			if (!string.IsNullOrEmpty(avatarName))
+				__1.m_name = avatarName;
+		}
+	}
+
+	[HarmonyPatch(typeof(Chat), nameof(Chat.OnNewChatMessage))]
+	static class Patch_Chat_OnNewChatMessage_AvatarBubbleName
+	{
+		[HarmonyPrefix]
+		static void Prefix(long senderID, UserInfo sender)
+		{
+			if (sender == null) return;
+
+			PlayerModel playerModel = Object.FindObjectsOfType<PlayerModel>().FirstOrDefault(model =>
+				model && model.player &&
+				(model.player.GetPlayerID() == senderID || model.player.GetZDOID().UserID == senderID));
+			if (!playerModel) return;
+
+			string avatarName = playerModel.GetAvatarDisplayName();
+			if (!string.IsNullOrEmpty(avatarName))
+				sender.Name = avatarName;
+		}
+	}
+
+	[HarmonyPatch(typeof(Terminal), nameof(Terminal.AddString), new[]
+	{
+		typeof(PlatformUserID), typeof(string), typeof(Talker.Type), typeof(bool)
+	})]
+	static class Patch_Terminal_AddString_KeepShoutCase
+	{
+		private static string KeepOriginalCase(string text) => text;
+
+		[HarmonyTranspiler]
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			MethodInfo toUpper = AccessTools.Method(typeof(string), nameof(string.ToUpper), Type.EmptyTypes);
+			MethodInfo keepOriginalCase = AccessTools.Method(
+				typeof(Patch_Terminal_AddString_KeepShoutCase), nameof(KeepOriginalCase));
+
+			foreach (CodeInstruction instruction in instructions)
+			{
+				if (instruction.Calls(toUpper))
+				{
+					instruction.opcode = OpCodes.Call;
+					instruction.operand = keepOriginalCase;
+				}
+
+				yield return instruction;
+			}
+		}
+	}
+
 	[HarmonyPatch(typeof(Humanoid), nameof(Humanoid.StartAttack))]
 	static class Patch_Humanoid_StartAttack_Sounds
 	{

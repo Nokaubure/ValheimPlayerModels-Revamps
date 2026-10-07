@@ -65,6 +65,9 @@ namespace ValheimPlayerModels
         public bool showCape;
 
         [Header("Action Sounds")]
+        [Range(0f, 1f)]
+        [Tooltip("Volume multiplier for this avatar's action sounds.")]
+        public float soundVolume = 1f;
         public AudioClip[] attackSounds = new AudioClip[0];
         public AudioClip[] heavyAttackSounds = new AudioClip[0];
         public AudioClip[] jumpSounds = new AudioClip[0];
