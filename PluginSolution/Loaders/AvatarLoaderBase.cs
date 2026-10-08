@@ -63,6 +63,7 @@ namespace ValheimPlayerModels.Loaders
                 case ValheimAvatarSoundType.Hurt: return AvatarDescriptor.hurtSounds;
                 case ValheimAvatarSoundType.Dead: return AvatarDescriptor.deadSounds;
                 case ValheimAvatarSoundType.Skill: return AvatarDescriptor.skillSounds;
+                case ValheimAvatarSoundType.Flinch: return AvatarDescriptor.flinchSounds;
                 default: return null;
             }
         }

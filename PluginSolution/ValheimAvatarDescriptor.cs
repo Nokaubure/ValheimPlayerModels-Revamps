@@ -27,7 +27,8 @@ namespace ValheimPlayerModels
         Jump,
         Hurt,
         Dead,
-        Skill
+        Skill,
+        Flinch
     }
 
     [Serializable]
@@ -63,6 +64,7 @@ namespace ValheimPlayerModels
 
         public bool showHelmet;
         public bool showCape;
+        public bool showTrinket;
 
         [Header("Action Sounds")]
         [Range(0f, 1f)]
@@ -74,6 +76,7 @@ namespace ValheimPlayerModels
         public AudioClip[] hurtSounds = new AudioClip[0];
         public AudioClip[] deadSounds = new AudioClip[0];
         public AudioClip[] skillSounds = new AudioClip[0];
+        public AudioClip[] flinchSounds = new AudioClip[0];
         
         public List<ValheimAvatarParameter> animatorParameters = new List<ValheimAvatarParameter>();
 

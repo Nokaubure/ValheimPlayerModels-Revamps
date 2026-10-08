@@ -150,6 +150,17 @@ namespace ValheimPlayerModels
 		}
 	}
 
+	[HarmonyPatch(typeof(Character), nameof(Character.Stagger))]
+	static class Patch_Character_Stagger_AvatarSound
+	{
+		[HarmonyPostfix]
+		static void Postfix(Character __instance)
+		{
+			if (__instance is Player player)
+				player.GetComponent<PlayerModel>()?.PlayAvatarSound(ValheimAvatarSoundType.Flinch);
+		}
+	}
+
 	[HarmonyPatch(typeof(Player), nameof(Player.OnDeath))]
 	static class Patch_Player_OnDeath_Sounds
 	{

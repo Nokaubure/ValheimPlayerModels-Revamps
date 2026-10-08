@@ -165,6 +165,10 @@ namespace ValheimPlayerModels
                     }
                 }
 
+                // Root motion or hit-reaction animation can leave the avatar root yawed
+                // away from the player's authoritative facing direction.
+                avatar.Transform.rotation = ogAnimator.transform.rotation;
+
                 foreach (AttachTransform attachTransform in ogAttachments)
                 {
                     if (attachTransform.pmAttach != null)
@@ -540,8 +544,16 @@ namespace ValheimPlayerModels
                     foreach (GameObject itemInstance in visEquipment.m_legItemInstances) { itemInstance?.SetActive(visible); }
                 if (visEquipment.m_chestItemInstances != null)
                     foreach (GameObject itemInstance in visEquipment.m_chestItemInstances) { itemInstance?.SetActive(visible); }
-                if (visEquipment.m_utilityItemInstances != null)
-                    foreach (GameObject itemInstance in visEquipment.m_utilityItemInstances) { itemInstance?.SetActive(visible); }
+                if (visEquipment.m_trinketItemInstances != null)
+                    foreach (GameObject itemInstance in visEquipment.m_trinketItemInstances)
+                    {
+                        if (itemInstance == null) continue;
+                        itemInstance.SetActive(visible || avatar.AvatarDescriptor.showTrinket);
+                    }
+                if (visEquipment.m_leftBackItemInstance != null)
+                    visEquipment.m_leftBackItemInstance.SetActive(false);
+                if (visEquipment.m_rightBackItemInstance != null)
+                    visEquipment.m_rightBackItemInstance.SetActive(false);
 
                 if (visible)
                 {

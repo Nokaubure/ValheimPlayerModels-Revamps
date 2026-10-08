@@ -30,6 +30,7 @@ public class ValheimAvatarDescriptorInspector : Editor
 
     private SerializedProperty showHelmet;
     private SerializedProperty showCape;
+    private SerializedProperty showTrinket;
 
     private SerializedProperty soundVolume;
     private SerializedProperty attackSounds;
@@ -38,6 +39,7 @@ public class ValheimAvatarDescriptorInspector : Editor
     private SerializedProperty hurtSounds;
     private SerializedProperty deadSounds;
     private SerializedProperty skillSounds;
+    private SerializedProperty flinchSounds;
 
     private SerializedProperty animatorParameters;
 
@@ -76,6 +78,7 @@ public class ValheimAvatarDescriptorInspector : Editor
 
         showHelmet = serializedObject.FindProperty("showHelmet");
         showCape = serializedObject.FindProperty("showCape");
+        showTrinket = serializedObject.FindProperty("showTrinket");
 
         soundVolume = serializedObject.FindProperty("soundVolume");
         attackSounds = serializedObject.FindProperty("attackSounds");
@@ -84,6 +87,7 @@ public class ValheimAvatarDescriptorInspector : Editor
         hurtSounds = serializedObject.FindProperty("hurtSounds");
         deadSounds = serializedObject.FindProperty("deadSounds");
         skillSounds = serializedObject.FindProperty("skillSounds");
+        flinchSounds = serializedObject.FindProperty("flinchSounds");
 
         animatorParameters = serializedObject.FindProperty("animatorParameters");
         actionMenuItems = serializedObject.FindProperty("actionMenuItems");
@@ -211,6 +215,7 @@ public class ValheimAvatarDescriptorInspector : Editor
         EditorGUILayout.LabelField("Show Features", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(showHelmet);
         EditorGUILayout.PropertyField(showCape);
+        EditorGUILayout.PropertyField(showTrinket);
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Action Sounds", EditorStyles.boldLabel);
@@ -221,6 +226,7 @@ public class ValheimAvatarDescriptorInspector : Editor
         EditorGUILayout.PropertyField(hurtSounds, new GUIContent("Hurt Sounds"), true);
         EditorGUILayout.PropertyField(deadSounds, new GUIContent("Dead Sounds"), true);
         EditorGUILayout.PropertyField(skillSounds, new GUIContent("Skill Sounds"), true);
+        EditorGUILayout.PropertyField(flinchSounds, new GUIContent("Flinch / Guard Break Sounds"), true);
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Action Menu - Parameters", EditorStyles.boldLabel);
